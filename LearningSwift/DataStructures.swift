@@ -24,10 +24,12 @@
      Cheap Get, expensive Delete.
  
  LINKED LIST
-     Cheap Delete, expensive Get. Inverse of the ArrayList.
+     Cheap Add/Remove, expensive Get. Inverse of the ArrayList.
+     To Get, it has to traverse every linked node till it finds the thing.
+     To Add, it links another node (nodes can be wherever in memory).
+     Deletes are cheap because all that is is changing what a pointer points to.
  
  */
-
 
 import Foundation
 
@@ -38,17 +40,31 @@ func performDataStructuresSection()
 //    var myStack:Stack = Stack();
 //    var myQueue:Queue = Queue();
     
-    let myArrayList:ArrayList = ArrayList();
-    print("ArrayList length: \(myArrayList.length)");
-    for i in 0..<100 {
-        myArrayList.push(i);
-        print("ArrayList length: \(myArrayList.length)");
-    }
-    print(myArrayList.getItems());
-    myArrayList.delete(index:2);
-    print(myArrayList.getItems());
-    myArrayList.delete(index:3);
-    print(myArrayList.getItems());
+//    let myArrayList:ArrayList = ArrayList();
+//    print("ArrayList length: \(myArrayList.length)");
+//    for i in 0..<100 {
+//        myArrayList.push(i);
+//        print("ArrayList length: \(myArrayList.length)");
+//    }
+//    print(myArrayList.getItems());
+//    myArrayList.delete(index:2);
+//    print(myArrayList.getItems());
+//    myArrayList.delete(index:3);
+//    print(myArrayList.getItems());
+    
+    let myLL = LinkedList();
+    myLL.push(11);
+    myLL.push(22);
+    myLL.push(33);
+    print(myLL.get(index:0));
+    print(myLL.get(index:1));
+    print(myLL.get(index:2));
+//    print(myLL.popTail()!);
+//    print(myLL.popTail()!);
+//    print(myLL.popTail()!);
+    myLL.delete(index:0);
+    print(myLL.get(index:0));
+    print(myLL.get(index:1));
 }
 
 class Set
@@ -211,6 +227,81 @@ class ArrayList
             } else {
                 break;
             }
+        }
+    }
+}
+
+class Node
+{
+    var payload:Int = 0;
+    var next:Node? = nil;
+    var previous:Node? = nil;
+    
+    init(_ value:Int) {
+        payload = value;
+    }
+}
+
+class LinkedList
+{
+    var head:Node? = nil;
+    var tail:Node? = nil;
+    var length:Int = 0;
+    
+    func push(_ value:Int) {
+        length += 1;
+        let newNode = Node(value);
+        if (nil == head) {
+            head = newNode;
+        } else {
+            tail!.next = newNode;
+            newNode.previous = tail!;
+        }
+        tail = newNode;
+    }
+    
+    func popTail() -> Int? {
+        if (nil == head) {
+            return nil;
+        }
+        if (length == 1) {
+            let payload = head!.payload;
+            head = nil;
+            tail = nil;
+            length -= 1;
+            return payload;
+        }
+        let payload = tail!.payload;
+        tail = tail!.previous!;
+        length -= 1;
+        return payload;
+    }
+    
+    func get(index:Int) -> Int {
+        if (length == 0 || index >= length) {
+            fatalError("Our silly linked list doesn't contain that much stuff!");
+        }
+        var currentNode:Node = head!;
+        for _ in 0..<index {
+            currentNode = currentNode.next!;
+        }
+        return currentNode.payload;
+    }
+    
+    func delete(index:Int) {
+        if (length == 0 || index >= length) {
+            fatalError("Our silly linked list doesn't contain that much stuff!");
+        }
+        if (index == 0) {               // Delete head?
+            head = head!.next!;
+        } else if (index == length) {   // Delete tail?
+            tail!.previous!.next = nil;
+        } else {                        // Delete something in the middle?
+            var nodeToDelete:Node = head!;
+            for _ in 0..<index {
+                nodeToDelete = nodeToDelete.next!;
+            }
+            nodeToDelete.previous!.next! = nodeToDelete.next!;
         }
     }
 }

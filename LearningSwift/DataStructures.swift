@@ -56,15 +56,22 @@ func performDataStructuresSection()
     myLL.push(11);
     myLL.push(22);
     myLL.push(33);
-    print(myLL.get(index:0));
-    print(myLL.get(index:1));
-    print(myLL.get(index:2));
+    print(myLL.get(itemAt:0));
+    print(myLL.get(itemAt:1));
+    print(myLL.get(itemAt:2));
 //    print(myLL.popTail()!);
 //    print(myLL.popTail()!);
 //    print(myLL.popTail()!);
-    myLL.delete(index:0);
-    print(myLL.get(index:0));
-    print(myLL.get(index:1));
+//    myLL.delete(index:0);
+//    print(myLL.get(index:0));
+//    print(myLL.get(index:1));
+    print(myLL.contains(66));
+    print(myLL.contains(22));
+//    myLL.delete(index:2);
+//    print(myLL.get(itemAt:2));  // Should fail: "linked list doesn't contain that much stuff!"
+    print(myLL.popTail() ?? "Nothing to pop...");
+    print(myLL.popTail() ?? "Nothing to pop...");
+    print(myLL.popTail() ?? "Nothing to pop...");
 }
 
 class Set
@@ -247,6 +254,7 @@ class LinkedList
     var head:Node? = nil;
     var tail:Node? = nil;
     var length:Int = 0;
+    var error_outOfBounds:String = "Our silly linked list doesn't contain that much stuff!";
     
     func push(_ value:Int) {
         length += 1;
@@ -261,25 +269,18 @@ class LinkedList
     }
     
     func popTail() -> Int? {
-        if (nil == head) {
+        if (length == 0) {
             return nil;
-        }
-        if (length == 1) {
-            let payload = head!.payload;
-            head = nil;
-            tail = nil;
-            length -= 1;
+        } else {
+            let payload = tail!.payload;
+            delete(index:length - 1);
             return payload;
         }
-        let payload = tail!.payload;
-        tail = tail!.previous!;
-        length -= 1;
-        return payload;
     }
     
-    func get(index:Int) -> Int {
+    func get(itemAt index:Int) -> Int {
         if (length == 0 || index >= length) {
-            fatalError("Our silly linked list doesn't contain that much stuff!");
+            fatalError(error_outOfBounds);
         }
         var currentNode:Node = head!;
         for _ in 0..<index {
@@ -288,20 +289,43 @@ class LinkedList
         return currentNode.payload;
     }
     
+    func get(value:Int) -> Int? {
+        if (contains(value)) {
+            return value;
+        } else {
+            return nil;
+        }
+    }
+    
     func delete(index:Int) {
         if (length == 0 || index >= length) {
-            fatalError("Our silly linked list doesn't contain that much stuff!");
+            fatalError(error_outOfBounds);
         }
-        if (index == 0) {               // Delete head?
-            head = head!.next!;
-        } else if (index == length) {   // Delete tail?
-            tail!.previous!.next = nil;
-        } else {                        // Delete something in the middle?
+        if (index == 0) {
+            // Delete head:
+            head = head!.next;
+        } else if (index == length - 1) {
+            // Delete tail:
+            tail = tail!.previous;
+        } else {
+            // Delete something in the middle:
             var nodeToDelete:Node = head!;
             for _ in 0..<index {
                 nodeToDelete = nodeToDelete.next!;
             }
             nodeToDelete.previous!.next! = nodeToDelete.next!;
         }
+        length -= 1;
+    }
+    
+    func contains(_ value:Int) -> Bool {
+        var currentNode:Node? = head;
+        while (nil != currentNode) {
+            if (value == currentNode?.payload) {
+                return true;
+            }
+            currentNode = currentNode!.next;
+        }
+        return false;
     }
 }
